@@ -1,0 +1,44 @@
+{
+  "name": "mr-sehi-frontend",
+  "version": "1.0.0",
+  "description": "مطعم مستر صحي — Restaurant Management Frontend",
+  "type": "module",
+  "scripts": {
+    "dev":       "vite",
+    "build":     "tsc && vite build",
+    "preview":   "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@hookform/resolvers":          "^3.6.0",
+    "@react-spring/web":            "^9.7.3",
+    "@tanstack/react-query":        "^5.40.0",
+    "@tanstack/react-table":        "^8.17.3",
+    "axios":                        "^1.7.2",
+    "framer-motion":                "^11.2.10",
+    "i18next":                      "^23.11.5",
+    "lucide-react":                 "^0.383.0",
+    "react":                        "^18.3.1",
+    "react-day-picker":             "^8.10.1",
+    "react-dom":                    "^18.3.1",
+    "react-hook-form":              "^7.51.5",
+    "react-i18next":                "^14.1.2",
+    "react-intersection-observer":  "^9.10.3",
+    "react-router-dom":             "^6.23.1",
+    "recharts":                     "^2.12.7",
+    "sonner":                       "^1.4.41",
+    "xlsx":                         "^0.18.5",
+    "zod":                          "^3.23.8",
+    "zustand":                      "^4.5.2"
+  },
+  "devDependencies": {
+    "@types/react":          "^18.3.3",
+    "@types/react-dom":      "^18.3.0",
+    "@vitejs/plugin-react":  "^4.3.0",
+    "autoprefixer":          "^10.4.19",
+    "postcss":               "^8.4.38",
+    "tailwindcss":           "^3.4.4",
+    "typescript":            "^5.4.5",
+    "vite":                  "^5.2.13"
+  }
+}
