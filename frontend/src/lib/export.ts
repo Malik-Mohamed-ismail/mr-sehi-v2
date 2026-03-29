@@ -2,10 +2,11 @@ import * as XLSX from 'xlsx'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
 import { arSA } from 'date-fns/locale'
+import i18n from './i18n'
 
 export function exportToExcel(data: any[], filename: string) {
   if (!data || data.length === 0) {
-    toast.error('لا يوجد بيانات للتصدير')
+    toast.error(i18n.t('common.noData', 'No data to export'))
     return
   }
   
@@ -31,9 +32,9 @@ export function exportToExcel(data: any[], filename: string) {
     
     const timestamp = format(new Date(), 'yyyy-MM-dd_HH-mm', { locale: arSA })
     XLSX.writeFile(wb, `${filename}_${timestamp}.xlsx`)
-    toast.success('تم تصدير الملف بنجاح')
+    toast.success(i18n.t('common.success', 'Exported successfully'))
   } catch (error) {
-    toast.error('حدث خطأ أثناء تصدير الملف')
+    toast.error(i18n.t('common.error', 'Export error'))
     console.error('Excel Export Error:', error)
   }
 }

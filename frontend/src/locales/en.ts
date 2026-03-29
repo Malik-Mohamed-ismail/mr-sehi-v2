@@ -953,8 +953,9 @@ export default {
     operating: 'Operating Activities',
     investing: 'Investing Activities',
     financing: 'Financing Activities',
-    netChange: 'Net Change',
-    dailyFlow: 'Daily Cash Flow'
+    netChange: 'Net Cash Change',
+    dailyFlow: 'Daily Cash Flow',
+    exportTitle: 'Cash_Flow_Statement'
   },
   breakeven: {
     aboveBreakeven: 'Above Break-Even ✓',
@@ -1100,5 +1101,27 @@ export default {
     delivery: 'Delivery',
     restaurant: 'Restaurant',
     subscriptions: 'Subscriptions'
+  },
+  balanceSheet: {
+    title: 'Balance Sheet',
+    asOf: 'As of',
+    details: 'Balance Sheet Details',
+    balanced: 'Balanced',
+    unbalanced: 'Unbalanced',
+    assets: 'Assets',
+    liabilities: 'Liabilities',
+    equity: 'Equity',
+    totalAssets: 'Total Assets',
+    totalLiabilities: 'Total Liabilities',
+    totalEquity: 'Total Equity',
+    totalLiabEquity: 'Total Liabilities & Equity',
+    allAssetsTotal: 'Total Current & Fixed Assets',
+    noData: 'No data',
+    exportExcel: 'Export Excel',
+    kpi: {
+      totalAssets: 'Total Assets',
+      totalLiabilities: 'Total Liabilities',
+      totalEquity: 'Total Equity'
+    }
   }
 }

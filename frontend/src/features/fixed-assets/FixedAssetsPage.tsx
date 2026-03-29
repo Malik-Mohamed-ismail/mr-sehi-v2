@@ -114,7 +114,14 @@ export default function FixedAssetsPage() {
   const depreciateMutation = useMutation({
     mutationFn: () => api.post('/fixed-assets/depreciate'),
     onSuccess: (res) => {
-      toast.success(res.data.message)
+      const msg = res.data.message;
+      if (msg === 'لا توجد أصول تتطلب إهلاك اليوم') {
+        toast.info(t('fixedAssets.messages.noDepreciationNeeded', 'No assets require depreciation today'))
+      } else if (msg === 'تم الإهلاك بنجاح' || msg.includes('نجاح')) {
+        toast.success(t('fixedAssets.messages.depreciationSuccess', 'Depreciation processed successfully'))
+      } else {
+        toast.success(msg)
+      }
       qc.invalidateQueries({ queryKey: ['fixed-assets'] })
       qc.invalidateQueries({ queryKey: ['dashboard'] })
       qc.invalidateQueries({ queryKey: ['journal'] })
@@ -165,7 +172,7 @@ export default function FixedAssetsPage() {
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
           <button className="btn btn-secondary" onClick={() => depreciateMutation.mutate()} disabled={depreciateMutation.isPending || !assets?.length}>
-            <Calculator size={16} /> {depreciateMutation.isPending ? t('common.loading') : 'تشغيل الإهلاك الآلي'}
+            <Calculator size={16} /> {depreciateMutation.isPending ? t('common.loading') : t('fixedAssets.buttons.runDepreciation', 'Run Auto Depreciation')}
           </button>
           <button className="btn btn-secondary" onClick={handleExport} disabled={!assets?.length}>
             <Download size={16} /> {t('fixedAssets.table.export')}
@@ -201,11 +208,11 @@ export default function FixedAssetsPage() {
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="card" style={{ marginBottom: 24 }}>
           <div className="form-card-header">
             <span className="form-card-header-title">{editingAsset ? <Edit2 size={16}/> : '🏢'} {editingAsset ? t('common.edit') : t('fixedAssets.section1')}</span>
-            <button type="button" className="form-close-btn" onClick={() => { reset(); setShowForm(false); setEditingAsset(null) }} title="إغلاق"><X size={16} /></button>
+            <button type="button" className="form-close-btn" onClick={() => { reset(); setShowForm(false); setEditingAsset(null) }} title={t('common.close', 'Close')}><X size={16} /></button>
           </div>
           <form onSubmit={handleSubmit((d) => editingAsset ? updateMutation.mutate({ id: editingAsset.id, data: d }) : createMutation.mutate(d))} dir={i18n.dir()}>
             <div className="form-section-header">
-              <div className="form-section-number">١</div>
+              <div className="form-section-number">1</div>
               <div className="form-section-title">{t('fixedAssets.section1')}</div>
             </div>
 
@@ -242,9 +249,9 @@ export default function FixedAssetsPage() {
                       ))
                     : (
                       <>
-                        <option value="كاش">كاش</option>
-                        <option value="بنك">بنك</option>
-                        <option value="آجل">آجل</option>
+                        <option value="كاش">{t('purchases.paymentMethods.cash', 'Cash')}</option>
+                        <option value="بنك">{t('purchases.paymentMethods.bank', 'Bank')}</option>
+                        <option value="آجل">{t('purchases.paymentMethods.credit', 'Credit')}</option>
                       </>
                     )
                   }
@@ -277,7 +284,7 @@ export default function FixedAssetsPage() {
                     <input readOnly value={vatAmt.toFixed(2)} className="form-input amount-field" />
                   </div>
                   <div className="form-field has-value">
-                    <label style={{ color: 'var(--color-success)' }}>قيمة الأصل (قبل الضريبة)</label>
+                    <label style={{ color: 'var(--color-success)' }}>{t('fixedAssets.fields.assetValueBeforeVat', 'Asset Value (Before VAT)')}</label>
                     <input readOnly value={baseAmt.toFixed(2)} className="form-input amount-field" style={{ fontWeight: 700 }} />
                   </div>
                 </div>
@@ -293,9 +300,7 @@ export default function FixedAssetsPage() {
 
             {!editingAsset && (
               <div style={{ background: 'rgba(43,146,37,0.08)', border: '1px solid rgba(43,146,37,0.2)', borderRadius: 8, padding: '10px 16px', marginBottom: 16, fontSize: 13, color: 'var(--color-success)', display: 'flex', alignItems: 'center', gap: 8 }}>
-                📒 {i18n.language === 'ar'
-                  ? `عند الحفظ يتم تلقائياً: مدين حساب ${ASSET_ACCOUNTS.find(a => a.type === assetType)?.nameAr ?? 'الأصل'} — دائن حساب الدفع`
-                  : `On save: Dr ${t(`fixedAssets.types.${assetType}`)} Account — Cr Payment Account`}
+                📒 {t('fixedAssets.messages.autoJournalEntry', `On save: Dr ${t(`fixedAssets.types.${assetType}`)} Account — Cr Payment Account`)}
               </div>
             )}
 
@@ -334,8 +339,8 @@ export default function FixedAssetsPage() {
                   <th>{t('fixedAssets.table.cost')}</th>
                   <th>{t('fixedAssets.table.vat')}</th>
                   <th>{t('fixedAssets.table.usefulLife')}</th>
-                  <th>الإهلاك</th>
-                  <th>الصافي</th>
+                  <th>{t('fixedAssets.table.accumulatedDepreciation', 'Depreciation')}</th>
+                  <th>{t('fixedAssets.table.netValue', 'Net Value')}</th>
                   <th style={{ width: 80 }}></th>
                 </tr>
               </thead>

@@ -9,6 +9,7 @@ import { PageTransition } from '../../components/ui/PageTransition'
 import { DateRangePicker } from '../../components/ui/DateRangePicker'
 import { AnimatedNumber } from '../../components/ui/AnimatedNumber'
 import { staggerContainer, staggerItem } from '../../lib/animations'
+import { exportToExcel } from '../../lib/export'
 
 const toDay = new Date().toISOString().split('T')[0]
 const fromDay = `${new Date().getFullYear()}-01-01`
@@ -37,6 +38,15 @@ export default function CashFlowPage() {
     { label: t('cashFlow.financing'),  id: 'financing', value: financing,  color: 'var(--color-warning)' },
   ]
 
+  const handleExport = () => {
+    if (!data) return
+    const rows = sections.map(s => ({
+      [s.label]: s.value,
+    }))
+    rows.push({ [t('cashFlow.netChange')]: netChange } as any)
+    exportToExcel(rows, t('cashFlow.exportTitle', 'Cash_Flow_Statement'))
+  }
+
   return (
     <PageTransition>
       <div style={{ padding: 24 }}>
@@ -48,8 +58,8 @@ export default function CashFlowPage() {
           <div style={{ display: 'flex', gap: 8 }}>
             <DateRangePicker from={from} to={to} onChange={(f, tr) => { setFrom(f); setTo(tr) }} />
             <button className="btn btn-ghost" onClick={() => refetch()}><RefreshCw size={14} /></button>
-            <button className="btn btn-secondary" style={{ gap: 6 }}>
-              <Download size={14} /> {t('common.exportPdf')}
+            <button className="btn btn-secondary" style={{ gap: 6 }} onClick={handleExport} disabled={!data}>
+              <Download size={14} /> {t('common.exportExcel', 'Export Excel')}
             </button>
           </div>
         </div>

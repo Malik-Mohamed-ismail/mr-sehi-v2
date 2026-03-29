@@ -154,7 +154,7 @@ export function Sidebar() {
               style={{ display: 'flex', alignItems: 'center', gap: 12, overflow: 'hidden', minWidth: 0 }}
             >
               <img src="/logo_icon_only.png" alt="logo"
-                style={{ width: 36, height: 36, objectFit: 'contain', flexShrink: 0 }} />
+                style={{ width: 44, height: 44, objectFit: 'contain', flexShrink: 0 }} />
               <div style={{ overflow: 'hidden' }}>
                 <div style={{ color: '#ffffff', fontWeight: 700, fontSize: 18, lineHeight: 1.2,
                   whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -170,7 +170,7 @@ export function Sidebar() {
 
         {!expanded && (
           <img src="/logo_icon_only.png" alt="logo"
-            style={{ width: 36, height: 36, objectFit: 'contain', margin: '0 auto' }} />
+            style={{ width: 44, height: 44, objectFit: 'contain', margin: '0 auto' }} />
         )}
 
         <button

@@ -4,14 +4,14 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { motion } from 'framer-motion'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Globe, Sun, Moon } from 'lucide-react'
 import { toast } from 'sonner'
 import { api } from '../../lib/api'
 import { useAuthStore } from '../../store/authStore'
 import { slideUp } from '../../lib/animations'
 import { useTranslation } from 'react-i18next'
 import i18n from '../../lib/i18n'
-
+import { useTheme } from '../../hooks/useTheme'
 const schema = z.object({
   email:    z.string().email(i18n.t('auth.invalidEmail')),
   password: z.string().min(1, i18n.t('auth.passwordRequired')),
@@ -23,6 +23,7 @@ export default function LoginPage() {
   const { setAuth }    = useAuthStore()
   const { t }          = useTranslation()
   const [showPw, setShowPw] = useState(false)
+  const { theme, toggle } = useTheme()
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -48,6 +49,33 @@ export default function LoginPage() {
       position: 'relative',
       overflow: 'hidden',
     }}>
+      {/* Action Buttons */}
+      <div style={{ position: 'absolute', top: 24, [i18n.dir() === 'rtl' ? 'left' : 'right']: 24, zIndex: 10, display: 'flex', gap: 12 }}>
+        <button 
+          type="button"
+          onClick={toggle}
+          className="btn btn-secondary"
+          style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '0 12px', height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          title={theme === 'dark' ? t('layout.themeLight', 'Light Mode') : t('layout.themeDark', 'Dark Mode')}
+        >
+          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
+
+        <button 
+          type="button"
+          onClick={() => {
+            const nextLang = i18n.language === 'en' ? 'ar' : 'en'
+            i18n.changeLanguage(nextLang)
+            document.documentElement.dir = nextLang === 'ar' ? 'rtl' : 'ltr'
+          }}
+          className="btn btn-secondary"
+          style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}
+        >
+          <Globe size={18} />
+          {i18n.language === 'en' ? 'العربية' : 'English'}
+        </button>
+      </div>
+
       {/* Dynamic Background Elements */}
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse at 50% 50%, var(--bg-sidebar-hover) 0%, var(--bg-sidebar) 100%)' }}/>
       

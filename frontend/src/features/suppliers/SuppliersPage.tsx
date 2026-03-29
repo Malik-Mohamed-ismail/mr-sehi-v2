@@ -124,22 +124,24 @@ export default function SuppliersPage() {
 
       {/* Summary Cards */}
       {(() => {
-        const total  = (suppliers ?? []).length
-        const active = (suppliers ?? []).filter((s: any) => s.is_active).length
-        const vatReg = (suppliers ?? []).filter((s: any) => s.vat_number).length
+        const stats = {
+          total: (suppliers ?? []).length,
+          active: (suppliers ?? []).filter((s: any) => s.is_active).length,
+          withVat: (suppliers ?? []).filter((s: any) => s.vat_number).length
+        }
         return (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 24 }}>
-            <div className="card kpi-card-primary" style={{ padding: '16px 20px' }}>
-              <div className="kpi-label">إجمالي الموردين</div>
-              <div className="kpi-value" style={{ fontSize: 22, color: 'var(--color-primary)' }}>{total}</div>
+            <div className="card kpi-card-info" style={{ padding: '16px 20px' }}>
+              <div className="kpi-label">{t('suppliers.kpi.total', 'Total Suppliers')}</div>
+              <div className="kpi-value" style={{ fontSize: 24, color: 'var(--color-info)' }}>{stats.total}</div>
             </div>
             <div className="card kpi-card-success" style={{ padding: '16px 20px' }}>
-              <div className="kpi-label">نشطون</div>
-              <div className="kpi-value" style={{ fontSize: 22, color: 'var(--color-success)' }}>{active}</div>
+              <div className="kpi-label">{t('suppliers.kpi.active', 'Active')}</div>
+              <div className="kpi-value" style={{ fontSize: 24, color: 'var(--color-success)' }}>{stats.active}</div>
             </div>
-            <div className="card kpi-card-info" style={{ padding: '16px 20px' }}>
-              <div className="kpi-label">مسجلو ضريبة القيمة المضافة</div>
-              <div className="kpi-value" style={{ fontSize: 22, color: 'var(--color-info)' }}>{vatReg}</div>
+            <div className="card kpi-card-warning" style={{ padding: '16px 20px' }}>
+              <div className="kpi-label">{t('suppliers.kpi.vatRegistered', 'VAT Registered')}</div>
+              <div className="kpi-value" style={{ fontSize: 24, color: 'var(--color-warning)' }}>{stats.withVat}</div>
             </div>
           </div>
         )

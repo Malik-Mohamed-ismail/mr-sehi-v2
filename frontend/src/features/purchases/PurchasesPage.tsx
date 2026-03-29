@@ -177,15 +177,15 @@ export default function PurchasesPage() {
         return (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 24 }}>
             <div className="card kpi-card-primary" style={{ padding: '16px 20px' }}>
-              <div className="kpi-label">إجمالي المشتريات</div>
+              <div className="kpi-label">{t('purchases.kpi.total', 'Total Purchases')}</div>
               <div className="kpi-value" style={{ fontSize: 22, color: 'var(--color-primary)' }}>{totalAmt.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} SAR</div>
             </div>
             <div className="card kpi-card-warning" style={{ padding: '16px 20px' }}>
-              <div className="kpi-label">ضريبة القيمة المضافة</div>
+              <div className="kpi-label">{t('purchases.kpi.vat', 'Total VAT')}</div>
               <div className="kpi-value" style={{ fontSize: 22, color: 'var(--color-warning)' }}>{totalVat.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} SAR</div>
             </div>
             <div className="card kpi-card-info" style={{ padding: '16px 20px' }}>
-              <div className="kpi-label">عدد الفواتير</div>
+              <div className="kpi-label">{t('purchases.kpi.count', 'Total Invoices')}</div>
               <div className="kpi-value" style={{ fontSize: 22, color: 'var(--color-info)' }}>{count}</div>
             </div>
           </div>

@@ -20,7 +20,7 @@ interface AccountItem {
 }
 
 export default function BalanceSheetPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [date, setDate] = useState(today)
 
   const { data, isLoading, refetch } = useQuery({
@@ -99,9 +99,9 @@ export default function BalanceSheetPage() {
            <div>
               <h1 className="display-text" style={{ fontSize: 40, color: 'var(--text-primary)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 16 }}>
                  <FileText size={40} color="var(--color-primary)" />
-                 ميزانية عمومية
+                 {t('balanceSheet.title')}
               </h1>
-              <p style={{ fontSize: 15, color: 'var(--text-secondary)' }}>كما في تاريخ {new Date(date).toLocaleDateString('ar-SA')}</p>
+              <p style={{ fontSize: 15, color: 'var(--text-secondary)' }}>{t('balanceSheet.asOf')} {new Date(date).toLocaleDateString(i18n.language === 'ar' ? 'ar-SA' : 'en-US')}</p>
            </div>
            
            <div style={{ display: 'flex', gap: 12, alignItems: 'center', background: 'var(--glass-bg)', padding: '8px 16px', borderRadius: 2, border: '1px solid var(--border-color)', backdropFilter: 'var(--glass-blur)', position: 'relative', zIndex: 20 }}>
@@ -113,7 +113,7 @@ export default function BalanceSheetPage() {
                <RefreshCw size={16} />
              </button>
              <button className="btn btn-secondary" onClick={handleExport} style={{ gap: 8, height: 44, paddingInline: 16 }} disabled={!data}>
-               <Download size={16} /> تصدير Excel
+               <Download size={16} /> {t('balanceSheet.exportExcel')}
              </button>
            </div>
         </div>
@@ -142,7 +142,7 @@ export default function BalanceSheetPage() {
                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'var(--color-success)' }}>
                       <Wallet size={20} />
-                      <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.5px' }}>إجمالي الأصول</span>
+                      <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.5px' }}>{t('balanceSheet.kpi.totalAssets')}</span>
                    </div>
                    <div className="hero-kpi-value" style={{ fontSize: 36, fontWeight: 700, color: 'var(--color-success)' }}>
                       <AnimatedNumber value={tat} suffix=" ر.س" />
@@ -161,7 +161,7 @@ export default function BalanceSheetPage() {
                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'var(--color-danger)' }}>
                       <Scale size={20} />
-                      <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.5px' }}>إجمالي الالتزامات</span>
+                      <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.5px' }}>{t('balanceSheet.kpi.totalLiabilities')}</span>
                    </div>
                    <div className="hero-kpi-value" style={{ fontSize: 36, fontWeight: 700, color: 'var(--color-danger)' }}>
                       <AnimatedNumber value={ttl} suffix=" ر.س" />
@@ -180,7 +180,7 @@ export default function BalanceSheetPage() {
                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'var(--color-info)' }}>
                       <LineChart size={20} />
-                      <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.5px' }}>إجمالي حقوق الملكية</span>
+                      <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.5px' }}>{t('balanceSheet.kpi.totalEquity')}</span>
                    </div>
                    <div className="hero-kpi-value" style={{ fontSize: 36, fontWeight: 700, color: 'var(--color-info)' }}>
                       <AnimatedNumber value={tte} suffix=" ر.س" />
@@ -196,12 +196,12 @@ export default function BalanceSheetPage() {
             }}>
                
                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid var(--border-color)', paddingBottom: 24, marginBottom: 32 }}>
-                 <h2 className="display-text" style={{ fontSize: 28, color: 'var(--text-primary)' }}>تفاصيل الميزانية العمومية</h2>
+                 <h2 className="display-text" style={{ fontSize: 28, color: 'var(--text-primary)' }}>{t('balanceSheet.details')}</h2>
                  <div style={{ display: 'flex', gap: 12 }}>
                     {isBalanced ? (
-                      <span style={{ padding: '6px 16px', background: 'var(--color-success-bg)', color: 'var(--color-success)', borderRadius: 2, fontSize: 14, fontWeight: 700 }}>متوازنة</span>
+                      <span style={{ padding: '6px 16px', background: 'var(--color-success-bg)', color: 'var(--color-success)', borderRadius: 2, fontSize: 14, fontWeight: 700 }}>{t('balanceSheet.balanced')}</span>
                     ) : (
-                      <span style={{ padding: '6px 16px', background: 'var(--color-danger-bg)', color: 'var(--color-danger)', borderRadius: 2, fontSize: 14, fontWeight: 700 }}>غير متوازنة</span>
+                      <span style={{ padding: '6px 16px', background: 'var(--color-danger-bg)', color: 'var(--color-danger)', borderRadius: 2, fontSize: 14, fontWeight: 700 }}>{t('balanceSheet.unbalanced')}</span>
                     )}
                  </div>
                </div>
@@ -213,15 +213,15 @@ export default function BalanceSheetPage() {
                     
                     {/* Equity Section */}
                     <div>
-                       <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--color-info)', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid var(--border-color)' }}>حقوق الملكية</h3>
+                       <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--color-info)', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid var(--border-color)' }}>{t('balanceSheet.equity')}</h3>
                        <div style={{ background: 'var(--bg-surface-2)', borderRadius: 2, padding: '8px 0' }}>
                           {data.equity?.length > 0 
                              ? data.equity.map((item: AccountItem, i: number) => renderAccountRow(item, i))
-                             : <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-secondary)' }}>لا يوجد بيانات</div>
+                             : <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-secondary)' }}>{t('balanceSheet.noData')}</div>
                           }
                        </div>
                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px 8px', marginTop: 8 }}>
-                          <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>إجمالي حقوق الملكية</span>
+                          <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>{t('balanceSheet.totalEquity')}</span>
                           <span className="number" style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)' }}>
                              {tte.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ر.س
                           </span>
@@ -230,15 +230,15 @@ export default function BalanceSheetPage() {
 
                     {/* Liabilities Section */}
                     <div>
-                       <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--color-danger)', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid var(--border-color)' }}>الالتزامات</h3>
+                       <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--color-danger)', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid var(--border-color)' }}>{t('balanceSheet.liabilities')}</h3>
                        <div style={{ background: 'var(--bg-surface-2)', borderRadius: 2, padding: '8px 0' }}>
                           {data.liabilities?.length > 0 
                              ? data.liabilities.map((item: AccountItem, i: number) => renderAccountRow(item, i))
-                             : <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-secondary)' }}>لا يوجد بيانات</div>
+                             : <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-secondary)' }}>{t('balanceSheet.noData')}</div>
                           }
                        </div>
                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px 8px', marginTop: 8 }}>
-                          <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>إجمالي الالتزامات</span>
+                          <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>{t('balanceSheet.totalLiabilities')}</span>
                           <span className="number" style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)' }}>
                              {ttl.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ر.س
                           </span>
@@ -247,7 +247,7 @@ export default function BalanceSheetPage() {
 
                     {/* Total Liab & Equity */}
                     <div style={{ marginTop: 'auto', background: 'var(--color-primary-light)', borderRadius: 2, padding: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid var(--color-primary)' }}>
-                       <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)' }}>إجمالي الالتزامات وحقوق الملكية</span>
+                       <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)' }}>{t('balanceSheet.totalLiabEquity')}</span>
                        <span className="number display-text" style={{ fontSize: 24, fontWeight: 800, color: 'var(--color-primary)' }}>
                           {(ttl + tte).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ر.س
                        </span>
@@ -260,15 +260,15 @@ export default function BalanceSheetPage() {
                     
                     {/* Assets Section */}
                     <div>
-                       <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--color-success)', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid var(--border-color)' }}>الأصول</h3>
+                       <h3 style={{ fontSize: 18, fontWeight: 800, color: 'var(--color-success)', marginBottom: 16, paddingBottom: 8, borderBottom: '1px solid var(--border-color)' }}>{t('balanceSheet.assets')}</h3>
                        <div style={{ background: 'var(--bg-surface-2)', borderRadius: 2, padding: '8px 0' }}>
                           {data.assets?.length > 0 
                              ? data.assets.map((item: AccountItem, i: number) => renderAccountRow(item, i))
-                             : <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-secondary)' }}>لا يوجد بيانات</div>
+                             : <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-secondary)' }}>{t('balanceSheet.noData')}</div>
                           }
                        </div>
                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px 8px', marginTop: 8 }}>
-                          <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>مجموع الأصول المتداولة والثابتة</span>
+                          <span style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>{t('balanceSheet.allAssetsTotal')}</span>
                           <span className="number" style={{ fontSize: 16, fontWeight: 800, color: 'var(--color-success)' }}>
                              {tat.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ر.س
                           </span>
@@ -277,7 +277,7 @@ export default function BalanceSheetPage() {
 
                     {/* Total Assets */}
                     <div style={{ marginTop: 'auto', background: 'var(--color-success-bg)', borderRadius: 2, padding: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid var(--color-success)' }}>
-                       <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)' }}>إجمالي الأصول</span>
+                       <span style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)' }}>{t('balanceSheet.totalAssets')}</span>
                        <span className="number display-text" style={{ fontSize: 24, fontWeight: 800, color: 'var(--color-success)' }}>
                           {tat.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ر.س
                        </span>

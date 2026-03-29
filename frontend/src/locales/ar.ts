@@ -1,4 +1,7 @@
 export default {
+  validation: {
+    required: 'حقل مطلوب'
+  },
   settings: {
     pageTitle: 'الإعدادات',
     pageSubtitle: 'System Configuration & User Management',
@@ -798,6 +801,7 @@ export default {
     loginTitle: 'أهلاً بك 👋',
     loginSubtitle: 'سجّل دخولك للمتابعة',
     emailPlaceholder: 'admin@mrsehi.sa',
+    footerNote: 'دخول آمن مشغل بواسطة مستر صحي',
   },
   dashboard: {
     financialStory: 'القصة المالية',
@@ -1020,8 +1024,9 @@ export default {
     username: 'اسم المستخدم',
     role: 'الصلاحية',
     active: 'نشط',
-    inactive: 'معطّل',
-    searchPlaceholder: 'بحث في المستخدمين...'
+    inactive: 'غير نشط',
+    searchPlaceholder: 'ابحث عن المستخدمين...',
+    updated: 'تم تحديث المستخدم بنجاح'
   },
   reports: {
     pageTitle: 'مركز التقارير المالية',
@@ -1100,5 +1105,27 @@ export default {
     delivery: 'التوصيل',
     restaurant: 'المطعم',
     subscriptions: 'الاشتراكات'
+  },
+  balanceSheet: {
+    title: 'الميزانية العمومية',
+    asOf: 'كما في تاريخ',
+    details: 'تفاصيل الميزانية العمومية',
+    balanced: 'متوازنة',
+    unbalanced: 'غير متوازنة',
+    assets: 'الأصول',
+    liabilities: 'الالتزامات',
+    equity: 'حقوق الملكية',
+    totalAssets: 'إجمالي الأصول',
+    totalLiabilities: 'إجمالي الالتزامات',
+    totalEquity: 'إجمالي حقوق الملكية',
+    totalLiabEquity: 'إجمالي الالتزامات وحقوق الملكية',
+    allAssetsTotal: 'مجموع الأصول المتداولة والثابتة',
+    noData: 'لا يوجد بيانات',
+    exportExcel: 'تصدير Excel',
+    kpi: {
+      totalAssets: 'إجمالي الأصول',
+      totalLiabilities: 'إجمالي الالتزامات',
+      totalEquity: 'إجمالي حقوق الملكية'
+    }
   }
 }
