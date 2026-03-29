@@ -1022,7 +1022,11 @@ export default {
     role: 'Role',
     active: 'Active',
     inactive: 'Inactive',
-    searchPlaceholder: 'Search users...'
+    searchPlaceholder: 'Search users...',
+    updated: 'User updated successfully',
+    deleted: 'User deleted successfully',
+    statusUpdated: 'User status updated successfully',
+    confirmDelete: 'Are you sure you want to delete this user? This action cannot be undone.'
   },
   reports: {
     pageTitle: 'Reports Center',

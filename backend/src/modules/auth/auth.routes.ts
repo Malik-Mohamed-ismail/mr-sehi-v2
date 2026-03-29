@@ -18,5 +18,6 @@ router.post('/change-password', authenticate, validate(ChangePasswordSchema), ct
 router.post('/users',           authenticate, authorize(...ADMIN_ONLY), validate(CreateUserSchema), ctrl.createUser)
 router.get ('/users',           authenticate, authorize(...ADMIN_ONLY), ctrl.listUsers)
 router.patch('/users/:id',      authenticate, authorize(...ADMIN_ONLY), validate(UpdateUserSchema), ctrl.updateUser)
+router.delete('/users/:id',     authenticate, authorize(...ADMIN_ONLY), ctrl.deleteUser)
 
 export default router

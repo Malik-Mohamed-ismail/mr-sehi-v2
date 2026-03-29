@@ -1026,7 +1026,10 @@ export default {
     active: 'نشط',
     inactive: 'غير نشط',
     searchPlaceholder: 'ابحث عن المستخدمين...',
-    updated: 'تم تحديث المستخدم بنجاح'
+    updated: 'تم تحديث المستخدم بنجاح',
+    deleted: 'تم حذف المستخدم بنجاح',
+    statusUpdated: 'تم تحديث حالة المستخدم بنجاح',
+    confirmDelete: 'هل أنت متأكد من حذف هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء.'
   },
   reports: {
     pageTitle: 'مركز التقارير المالية',

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
-import { Plus, RefreshCw, Users, CheckCircle, XCircle, Loader2, X, Edit2 } from 'lucide-react'
+import { Plus, RefreshCw, Users, CheckCircle, XCircle, Loader2, X, Edit2, Trash2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -56,7 +56,7 @@ export default function UsersPage() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string, data: Partial<FormData> }) => api.put(`/auth/users/${id}`, data),
+    mutationFn: ({ id, data }: { id: string, data: Partial<FormData> }) => api.patch(`/auth/users/${id}`, data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['users'] })
       toast.success(t('users.updated') || 'تم التحديث بنجاح')
@@ -70,7 +70,20 @@ export default function UsersPage() {
   const toggleActive = useMutation({
     mutationFn: ({ id, is_active }: { id: string; is_active: boolean }) =>
       api.patch(`/auth/users/${id}`, { is_active }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['users'] }),
+    onSuccess: (res: any) => {
+      qc.invalidateQueries({ queryKey: ['users'] })
+      toast.success(res?.data?.message || t('users.statusUpdated') || 'تم تحديث حالة المستخدم بنجاح')
+    },
+    onError: (err: any) => toast.error(err?.response?.data?.error?.message ?? t('common.error')),
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.delete(`/auth/users/${id}`),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['users'] })
+      toast.success(t('users.deleted') || 'تم الحذف بنجاح')
+    },
+    onError: (err: any) => toast.error(err?.response?.data?.error?.message ?? t('common.error')),
   })
 
   const users = (data ?? []).filter((u: any) =>
@@ -192,6 +205,18 @@ export default function UsersPage() {
                     title={user.is_active ? (t('users.active') || 'نشط') : (t('users.inactive') || 'غير نشط')}
                   >
                     {user.is_active ? <CheckCircle size={14} /> : <XCircle size={14} />}
+                  </button>
+                  <button
+                    className="btn btn-sm btn-ghost"
+                    style={{ color: 'var(--color-danger)' }}
+                    onClick={() => {
+                      if (window.confirm(t('users.confirmDelete') || 'هل أنت متأكد من حذف هذا المستخدم؟')) {
+                        deleteMutation.mutate(user.id)
+                      }
+                    }}
+                    title={t('common.delete') || 'حذف'}
+                  >
+                    <Trash2 size={14} />
                   </button>
                 </div>
               </motion.div>

@@ -195,6 +195,20 @@ export async function updateUser(userId: string, dto: UpdateUserDto) {
   return sanitizeUser(updated)
 }
 
+export async function deleteUser(userId: string) {
+  try {
+    const [deleted] = await db.delete(users).where(eq(users.id, userId)).returning()
+    if (!deleted) {
+      throw new AppError('NOT_FOUND', 404, 'المستخدم غير موجود')
+    }
+  } catch (error: any) {
+    if (error.code === '23503') { // Postgres foreign_key_violation
+      throw new AppError('VALIDATION_ERROR', 400, 'لا يمكن حذف المستخدم لوجود سجلات مالية مرتبطة به. يمكنك إيقاف حسابه بدلاً من ذلك.')
+    }
+    throw error
+  }
+}
+
 function sanitizeUser(u: typeof users.$inferSelect) {
   const { password_hash, ...safe } = u
   return safe

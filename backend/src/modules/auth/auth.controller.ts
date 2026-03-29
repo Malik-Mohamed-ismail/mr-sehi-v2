@@ -88,3 +88,10 @@ export async function updateUser(req: Request, res: Response, next: NextFunction
     res.json({ success: true, data: user, message: 'تم تحديث المستخدم' })
   } catch (err) { next(err) }
 }
+
+export async function deleteUser(req: Request, res: Response, next: NextFunction) {
+  try {
+    await authService.deleteUser(req.params.id)
+    res.json({ success: true, data: null, message: 'تم حذف المستخدم بنجاح' })
+  } catch (err) { next(err) }
+}
