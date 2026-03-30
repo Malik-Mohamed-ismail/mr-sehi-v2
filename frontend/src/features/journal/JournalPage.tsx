@@ -88,6 +88,8 @@ export default function JournalPage() {
       [i18n.t('journal.table.description')]: e.description,
       [i18n.t('journal.table.source')]: SOURCE_LABELS[e.source_type] ?? e.source_type,
       [i18n.t('journal.table.reference')]: e.reference || '-',
+      [i18n.t('journal.table.debitAccount')]: e.debit_account_name || '-',
+      [i18n.t('journal.table.creditAccount')]: e.credit_account_name || '-',
       [i18n.t('journal.fields.debit')]: Number(e.amount) || 0,
       [i18n.t('journal.fields.credit')]: Number(e.amount) || 0,
       [i18n.t('journal.table.isBalanced')]: e.is_balanced ? i18n.t('journal.table.yes') : i18n.t('journal.table.no'),
@@ -227,6 +229,8 @@ export default function JournalPage() {
                   <th>{t('journal.table.description')}</th>
                   <th>{t('journal.table.source')}</th>
                   <th>{t('journal.table.reference')}</th>
+                  <th>{t('journal.table.debitAccount')}</th>
+                  <th>{t('journal.table.creditAccount')}</th>
                   <th>{t('journal.fields.debit')}</th>
                   <th>{t('journal.fields.credit')}</th>
                   <th>{t('journal.table.isBalanced')}</th>
@@ -243,6 +247,8 @@ export default function JournalPage() {
                     <td style={{ minWidth: 200, whiteSpace: 'normal', lineHeight: 1.5 }}>{e.description}</td>
                     <td><span className="badge badge-info">{SOURCE_LABELS[e.source_type] ?? e.source_type}</span></td>
                     <td style={{ fontFamily: 'var(--font-latin)' }}>{e.reference || '-'}</td>
+                    <td style={{ maxWidth: 150, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={e.debit_account_name}>{e.debit_account_name || '-'}</td>
+                    <td style={{ maxWidth: 150, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={e.credit_account_name}>{e.credit_account_name || '-'}</td>
                     <td className="amount" style={{ fontWeight: 600, color: 'var(--color-success)' }}>{formatSAR(Number(e.amount) || 0)}</td>
                     <td className="amount" style={{ fontWeight: 600, color: 'var(--color-danger)' }}>{formatSAR(Number(e.amount) || 0)}</td>
                     <td>
@@ -271,7 +277,7 @@ export default function JournalPage() {
                   </tr>
                 ))}
                 {!entries?.length && (
-                  <tr><td colSpan={10} style={{ textAlign: 'center', padding: 40, color: 'var(--text-secondary)' }}>{t('journal.table.empty')}</td></tr>
+                  <tr><td colSpan={12} style={{ textAlign: 'center', padding: 40, color: 'var(--text-secondary)' }}>{t('journal.table.empty')}</td></tr>
                 )}
               </tbody>
             </table>

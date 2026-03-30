@@ -27,11 +27,14 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
         user_id:    auditLog.user_id,
         username:   users.username,
         full_name:  users.full_name,
+        email:      users.email,
         action:     auditLog.action,
         table_name: auditLog.table_name,
         record_id:  auditLog.record_id,
         ip_address: auditLog.ip_address,
         created_at: auditLog.created_at,
+        old_values: auditLog.old_values,
+        new_values: auditLog.new_values,
       })
       .from(auditLog)
       .leftJoin(users, eq(auditLog.user_id, users.id))

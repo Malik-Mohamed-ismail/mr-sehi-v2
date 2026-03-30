@@ -48,7 +48,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
 export async function logout(req: Request, res: Response, next: NextFunction) {
   try {
     const token = req.cookies?.[COOKIE_NAME]
-    if (token) await authService.logout(token)
+    if (token) await authService.logout(token, req.ip, req.headers['user-agent'])
     res.clearCookie(COOKIE_NAME)
     res.clearCookie('csrf-token')
     res.json({ success: true, data: null, message: 'تم تسجيل الخروج' })

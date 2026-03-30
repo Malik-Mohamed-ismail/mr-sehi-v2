@@ -87,7 +87,6 @@ const NAV_SECTIONS: NavSection[] = [
     id: 'admin', title: 'sidebar.administration',
     items: [
       { to: '/users',     icon: <UserCog size={20}/>, label: 'pages.users',    roles: ['admin'] },
-      { to: '/audit-log', icon: <Shield size={20}/>,  label: 'pages.auditLog', roles: ['admin'] },
     ],
   },
 ]

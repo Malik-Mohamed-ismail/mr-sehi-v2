@@ -5,7 +5,7 @@ export const auditLog = pgTable('audit_log', {
   id:         uuid('id').defaultRandom().primaryKey(),
   user_id:    uuid('user_id').references(() => users.id),
   action:     varchar('action', { length: 20 })
-                .$type<'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'EXPORT'>()
+                .$type<'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT' | 'EXPORT'>()
                 .notNull(),
   table_name: varchar('table_name', { length: 50 }).notNull(),
   record_id:  uuid('record_id'),

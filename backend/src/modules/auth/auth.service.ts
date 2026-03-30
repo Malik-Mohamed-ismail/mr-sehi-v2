@@ -137,11 +137,26 @@ export async function refreshAccessToken(refreshToken: string) {
 }
 
 // ── Logout ────────────────────────────────────────────────────────────────
-export async function logout(refreshToken: string) {
+export async function logout(refreshToken: string, ipAddress?: string, userAgent?: string) {
   const tokenHash = hashToken(refreshToken)
-  await db.update(refreshTokens)
-    .set({ revoked: true })
-    .where(eq(refreshTokens.token_hash, tokenHash))
+
+  // Look up user before revoking
+  const [stored] = await db.select().from(refreshTokens).where(eq(refreshTokens.token_hash, tokenHash))
+  const userId = stored?.user_id
+
+  await db.transaction(async (tx) => {
+    await tx.update(refreshTokens)
+      .set({ revoked: true })
+      .where(eq(refreshTokens.token_hash, tokenHash))
+    
+    if (userId) {
+      await writeAuditLog(tx, {
+        userId, action: 'LOGOUT', 
+        tableName: 'users', recordId: userId,
+        ipAddress, userAgent
+      })
+    }
+  })
 }
 
 // ── Change Password ───────────────────────────────────────────────────────

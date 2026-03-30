@@ -101,7 +101,19 @@ export async function listEntries(query: any) {
       created_by: journalEntries.created_by,
       created_at: journalEntries.created_at,
       updated_at: journalEntries.updated_at,
-      amount: sql<number>`(SELECT COALESCE(SUM(debit_amount), 0) FROM journal_entry_lines WHERE entry_id = journal_entries.id)::numeric`
+      amount: sql<number>`(SELECT COALESCE(SUM(debit_amount), 0) FROM journal_entry_lines WHERE entry_id = journal_entries.id)::numeric`,
+      debit_account_name: sql<string>`(
+        SELECT string_agg(a.name_ar, ' + ')
+        FROM journal_entry_lines jel
+        JOIN accounts a ON a.code = jel.account_code
+        WHERE jel.entry_id = journal_entries.id AND jel.debit_amount > 0
+      )`,
+      credit_account_name: sql<string>`(
+        SELECT string_agg(a.name_ar, ' + ')
+        FROM journal_entry_lines jel
+        JOIN accounts a ON a.code = jel.account_code
+        WHERE jel.entry_id = journal_entries.id AND jel.credit_amount > 0
+      )`
     }).from(journalEntries)
       .where(conditions.length ? and(...conditions) : undefined)
       .orderBy(desc(journalEntries.entry_date))

@@ -226,7 +226,9 @@ export default {
       reversed: 'Reversed',
       active: 'Active',
       export: 'Export Excel',
-      empty: 'No entries found'
+      empty: 'No entries found',
+      debitAccount: 'Debit Account',
+      creditAccount: 'Credit Account'
     },
     dialogs: {
       reverseTitle: 'Reverse Entry',

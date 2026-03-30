@@ -229,7 +229,9 @@ export default {
       reversed: 'مُعكوس',
       active: 'فعّال',
       export: 'تصدير Excel',
-      empty: 'لا توجد قيود'
+      empty: 'لا توجد قيود',
+      debitAccount: 'حساب المدين',
+      creditAccount: 'حساب الدائن'
     },
     dialogs: {
       reverseTitle: 'عكس القيد',

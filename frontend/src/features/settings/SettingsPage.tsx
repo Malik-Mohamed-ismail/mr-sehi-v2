@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next'
 import i18n from '../../lib/i18n'
 
 import { LookupsTab } from './LookupsTab'
+import { SearchInput } from '../../components/ui/SearchInput'
 
 import { CustomSelect } from '../../components/ui/CustomSelect'
 type TabType = 'system' | 'users' | 'audit' | 'lookups'
@@ -304,24 +305,72 @@ function UsersManagementTab() {
   )
 }
 
+
+function JsonHighlighter({ data }: { data: any }) {
+  if (!data) return <div style={{ opacity: 0.5 }}>—</div>;
+  const json = JSON.stringify(data, null, 2);
+  
+  const colored = json.replace(
+    /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+    (match) => {
+      let color = 'var(--text-secondary)';
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) color = 'var(--color-primary)';
+        else color = 'var(--color-success)';
+      } else if (/true|false/.test(match)) {
+        color = 'var(--color-info)';
+      } else if (/null/.test(match)) {
+        color = 'var(--color-danger)';
+      } else if (/[0-9]/.test(match)) {
+        color = 'var(--color-warning)';
+      }
+      return '<span style="color: ' + color + '">' + match + '</span>';
+    }
+  );
+
+  return (
+    <pre 
+      style={{ margin: 0, padding: 12, fontSize: 11, background: 'var(--bg-surface)', borderRadius: 4, whiteSpace: 'pre-wrap', border: '1px solid var(--border-color)', lineHeight: 1.5, direction: 'ltr', textAlign: 'left' }}
+      dangerouslySetInnerHTML={{ __html: colored }} 
+    />
+  );
+}
+
 function AuditLogsTab() {
   const { t } = useTranslation()
+  const [search, setSearch] = useState('')
   const { data: logs, isLoading } = useQuery({
     queryKey: ['audit-logs'],
-    queryFn: () => api.get('/audit-log?limit=100').then(r => r.data.data),
+    queryFn: () => api.get('/audit-log?limit=500').then(r => r.data.data),
   })
 
-  // Basic styling mapping for actions
+  const filtered = (logs ?? []).filter((log: any) => {
+    if (!search) return true
+    const s = search.toLowerCase()
+    return (
+      log.full_name?.toLowerCase().includes(s) ||
+      log.email?.toLowerCase().includes(s) ||
+      log.username?.toLowerCase().includes(s) ||
+      log.table_name?.toLowerCase().includes(s) ||
+      log.action?.toLowerCase().includes(s)
+    )
+  })
+
   const actionColors: Record<string, string> = {
     CREATE: 'badge-success',
     UPDATE: 'badge-info',
     DELETE: 'badge-danger',
+    LOGIN:  'badge-neutral',
+    LOGOUT: 'badge-warning',
   }
 
   return (
     <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid var(--border-color)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid var(--border-color)', gap: 16 }}>
         <span style={{ fontWeight: 700 }}>{t('settings.audit.title')}</span>
+        <div style={{ width: 300 }}>
+          <SearchInput value={search} onChange={setSearch} placeholder={t('common.search')} />
+        </div>
       </div>
       
       {isLoading ? (
@@ -340,26 +389,53 @@ function AuditLogsTab() {
               </tr>
             </thead>
             <tbody>
-              {(logs ?? []).map((log: any) => (
+              {filtered.map((log: any) => (
                 <tr key={log.id}>
                   <td style={{ fontFamily: 'var(--font-latin)' }}>
                     {new Date(log.created_at).toLocaleString('ar-SA')}
                   </td>
-                  <td style={{ fontWeight: 600 }}>{log.full_name ?? log.username ?? log.user_id ?? '—'}</td>
                   <td>
-                    <span className={`badge ${actionColors[log.action] ?? 'badge-neutral'}`}>
+                    <div style={{ fontWeight: 600 }}>{log.full_name ?? log.username ?? '—'}</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-secondary)', fontFamily: 'var(--font-latin)' }}>{log.email}</div>
+                  </td>
+                  <td>
+                    <span className={'badge ' + (actionColors[log.action] ?? 'badge-neutral')}>
                       {log.action}
                     </span>
                   </td>
                   <td style={{ fontFamily: 'var(--font-latin)' }}>{log.table_name}</td>
-                  <td>
-                    <details style={{ cursor: 'pointer', fontSize: 11, fontFamily: 'var(--font-latin)', background: 'var(--bg-page)', padding: 4, borderRadius: 2 }}>
-                      <summary style={{ outline: 'none' }}>{t('settings.audit.showDetails')}</summary>
-                      <pre style={{ margin: 0, marginTop: 4, whiteSpace: 'pre-wrap', color: 'var(--text-secondary)' }}>
-                        {JSON.stringify(log.new_values || log.old_values, null, 2)}
-                      </pre>
-                    </details>
-                  </td>
+                  
+                <td>
+                  <details style={{ cursor: 'pointer', fontSize: 11, fontFamily: 'var(--font-latin)', background: 'var(--bg-surface-2)', padding: '6px 10px', borderRadius: 4, border: '1px solid var(--border-color)' }}>
+                    <summary style={{ outline: 'none', fontWeight: 600 }}>{t('settings.audit.showDetails')}</summary>
+                    <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {log.ip_address && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff', padding: '10px 14px', borderRadius: 6, border: '1px solid var(--border-color)', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>{t('settings.audit.table.ipAddress', 'عنوان IP')}</span>
+                          <span style={{ fontSize: 13, fontFamily: 'var(--font-latin)', fontWeight: 700, color: 'var(--text-main)' }}>{log.ip_address}</span>
+                        </div>
+                      )}
+                      {log.user_agent && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, background: '#fff', padding: '10px 14px', borderRadius: 6, border: '1px solid var(--border-color)', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, opacity: 0.5, textTransform: 'uppercase' }}>{t('settings.audit.table.userAgent', 'الجهاز')}</span>
+                          <span style={{ fontSize: 12, fontFamily: 'var(--font-latin)', opacity: 0.8, lineHeight: 1.4 }}>{log.user_agent}</span>
+                        </div>
+                      )}
+                      {log.old_values && (
+                        <div>
+                          <div style={{ marginBottom: 4, fontWeight: 700, opacity: 0.7, textTransform: 'uppercase', fontSize: 10 }}>{t('common.old', 'القيمة السابقة')}</div>
+                          <JsonHighlighter data={log.old_values} />
+                        </div>
+                      )}
+                      {log.new_values && (
+                        <div>
+                          <div style={{ marginBottom: 4, fontWeight: 700, opacity: 0.7, textTransform: 'uppercase', fontSize: 10, color: 'var(--color-success)' }}>{t('common.new', 'القيمة الجديدة')}</div>
+                          <JsonHighlighter data={log.new_values} />
+                        </div>
+                      )}
+                    </div>
+                  </details>
+                </td>
                 </tr>
               ))}
             </tbody>
@@ -370,4 +446,3 @@ function AuditLogsTab() {
     </div>
   )
 }
-

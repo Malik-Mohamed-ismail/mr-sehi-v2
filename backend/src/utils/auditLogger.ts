@@ -2,7 +2,7 @@ import { auditLog } from '../db/schema/auditLog.js'
 
 export interface AuditParams {
   userId: string
-  action:    'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'EXPORT'
+  action:    'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'LOGOUT' | 'EXPORT'
   tableName: string
   recordId?: string
   oldValues?: unknown
