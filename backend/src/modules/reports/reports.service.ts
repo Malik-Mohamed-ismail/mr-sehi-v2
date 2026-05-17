@@ -102,8 +102,15 @@ export async function getDashboard(from?: string, to?: string) {
   const now    = new Date()
   const f      = from ?? `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
   const t      = to   ?? now.toISOString().split('T')[0]
-  const [income, subStats] = await Promise.all([
+
+  // Compute previous period of the same length for trend comparison
+  const periodMs   = new Date(t).getTime() - new Date(f).getTime()
+  const prevTo     = new Date(new Date(f).getTime() - 86400000).toISOString().split('T')[0]
+  const prevFrom   = new Date(new Date(f).getTime() - periodMs - 86400000).toISOString().split('T')[0]
+
+  const [income, prevIncome, subStats] = await Promise.all([
     getIncomeStatement(f, t),
+    getIncomeStatement(prevFrom, prevTo),
     db.execute(sql`
       SELECT
         COUNT(*) FILTER (WHERE status = 'active' AND is_deleted = false) AS active_subscribers,
@@ -112,8 +119,12 @@ export async function getDashboard(from?: string, to?: string) {
     `)
   ])
 
+  const trend = (curr: number, prev: number) =>
+    prev === 0 ? null : parseFloat((((curr - prev) / Math.abs(prev)) * 100).toFixed(1))
+
   return {
-    period: { from: f, to: t },
+    period:             { from: f, to: t },
+    prev_period:        { from: prevFrom, to: prevTo },
     revenue:            income.revenue,
     gross_profit:       income.gross_profit,
     gross_margin:       income.gross_margin,
@@ -121,6 +132,12 @@ export async function getDashboard(from?: string, to?: string) {
     net_margin:         income.net_margin,
     total_expenses:     income.total_expenses,
     subscribers:        (subStats as any).rows[0],
+    trends: {
+      revenue:     trend(income.revenue.total,     prevIncome.revenue.total),
+      net_profit:  trend(income.net_profit,         prevIncome.net_profit),
+      expenses:    trend(income.total_expenses,     prevIncome.total_expenses),
+      gross_margin:trend(income.gross_margin * 100, prevIncome.gross_margin * 100),
+    },
   }
 }
 
