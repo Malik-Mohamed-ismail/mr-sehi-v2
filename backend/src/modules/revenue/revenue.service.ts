@@ -8,14 +8,18 @@ import { validateJournalBalance } from '../../utils/accounting.js'
 import { writeAuditLog } from '../../utils/auditLogger.js'
 import { AppError } from '../../utils/AppError.js'
 
+// Account codes:
+//   410101 = Delivery Revenue, 410102 = Restaurant Revenue, 410103 = Subscription Revenue
+//   1105   = Delivery Receivable (used for آجل — platform owes us)
+const REVENUE_PAYMENT_ACCOUNTS: Record<string, string> = { 'كاش': '1101', 'بنك': '1104', 'آجل': '1105' }
+
 // ── Delivery ─────────────────────────────────────────────────────────────
-async function createRevenueJournalEntry(tx: any, amount: number, description: string, date: string, paymentMethod: string, userId: string) {
-  const REVENUE_ACCOUNT   = '410101'
-  const PAYMENT_ACCOUNTS: Record<string, string> = { 'كاش': '1101', 'بنك': '1104', 'آجل': '1201' }
+async function createRevenueJournalEntry(tx: any, amount: number, description: string, date: string, paymentMethod: string, userId: string, revenueAccount = '410101') {
+  const PAYMENT_ACCOUNTS = REVENUE_PAYMENT_ACCOUNTS
   const creditAccount     = PAYMENT_ACCOUNTS[paymentMethod] ?? '1104'
   const lines             = [
     { account_code: creditAccount,    debit_amount: amount, credit_amount: 0 },
-    { account_code: REVENUE_ACCOUNT,  debit_amount: 0, credit_amount: amount },
+    { account_code: revenueAccount,   debit_amount: 0, credit_amount: amount },
   ]
   const { isBalanced } = validateJournalBalance(lines)
   if (!isBalanced) throw new AppError('JOURNAL_UNBALANCED', 422)
@@ -67,7 +71,7 @@ export async function createDeliveryRevenue(dto: any, userId: string) {
     const [row] = await tx.insert(deliveryRevenue).values({
       ...dto, net_amount: String(net), created_by: userId,
     } as any).returning()
-    const entry = await createRevenueJournalEntry(tx, net, `إيراد توصيل — ${dto.platform}`, dto.revenue_date, dto.payment_method, userId)
+    const entry = await createRevenueJournalEntry(tx, net, `إيراد توصيل — ${dto.platform}`, dto.revenue_date, dto.payment_method, userId, '410101')
     await tx.update(deliveryRevenue).set({ journal_entry_id: entry.id } as any).where(eq(deliveryRevenue.id, row.id))
     await writeAuditLog(tx, { userId, action: 'CREATE', tableName: 'delivery_revenue', recordId: row.id, newValues: row })
     return row
@@ -86,19 +90,15 @@ export async function updateDeliveryRevenue(id: string, dto: any, userId: string
     
     if (row.journal_entry_id) {
       await tx.update(journalEntries).set({
-        expense_date: dto.revenue_date,
+        entry_date: dto.revenue_date,
         description: `إيراد توصيل — ${dto.platform}`
       } as any).where(eq(journalEntries.id, row.journal_entry_id))
-      
+
       await tx.delete(journalEntryLines).where(eq(journalEntryLines.entry_id, row.journal_entry_id))
-      
-      const REVENUE_ACCOUNT   = '410101'
-      const PAYMENT_ACCOUNTS = { 'كاش': '1101', 'بنك': '1104', 'آجل': '1201' }
-      const creditAccount    = PAYMENT_ACCOUNTS[dto.payment_method] ?? '1104'
-      
+      const creditAccount = REVENUE_PAYMENT_ACCOUNTS[dto.payment_method] ?? '1104'
       await tx.insert(journalEntryLines).values([
-        { entry_id: row.journal_entry_id, account_code: creditAccount,    debit_amount: net, credit_amount: 0 },
-        { entry_id: row.journal_entry_id, account_code: REVENUE_ACCOUNT,  debit_amount: 0, credit_amount: net },
+        { entry_id: row.journal_entry_id, account_code: creditAccount, debit_amount: net, credit_amount: 0 },
+        { entry_id: row.journal_entry_id, account_code: '410101',      debit_amount: 0, credit_amount: net },
       ])
     }
     
@@ -133,7 +133,7 @@ export async function deleteDeliveryRevenue(id: string, userId: string) {
 export async function createRestaurantRevenue(dto: any, userId: string) {
   return db.transaction(async (tx) => {
     const [row] = await tx.insert(restaurantRevenue).values({ ...dto, created_by: userId } as any).returning()
-    const entry = await createRevenueJournalEntry(tx, Number(dto.amount), 'إيراد مطعم', dto.revenue_date, dto.payment_method, userId)
+    const entry = await createRevenueJournalEntry(tx, Number(dto.amount), 'إيراد مطعم', dto.revenue_date, dto.payment_method, userId, '410102')
     await tx.update(restaurantRevenue).set({ journal_entry_id: entry.id } as any).where(eq(restaurantRevenue.id, row.id))
     await writeAuditLog(tx, { userId, action: 'CREATE', tableName: 'restaurant_revenue', recordId: row.id, newValues: row })
     return row
@@ -151,20 +151,16 @@ export async function updateRestaurantRevenue(id: string, dto: any, userId: stri
     
     if (row.journal_entry_id) {
       await tx.update(journalEntries).set({
-        expense_date: dto.revenue_date,
+        entry_date: dto.revenue_date,
         description: 'إيراد مطعم'
       } as any).where(eq(journalEntries.id, row.journal_entry_id))
-      
+
       await tx.delete(journalEntryLines).where(eq(journalEntryLines.entry_id, row.journal_entry_id))
-      
-      const REVENUE_ACCOUNT   = '410101'
-      const PAYMENT_ACCOUNTS = { 'كاش': '1101', 'بنك': '1104', 'آجل': '1201' }
-      const creditAccount    = PAYMENT_ACCOUNTS[dto.payment_method] ?? '1104'
+      const creditAccount = REVENUE_PAYMENT_ACCOUNTS[dto.payment_method] ?? '1104'
       const amount = Number(dto.amount)
-      
       await tx.insert(journalEntryLines).values([
-        { entry_id: row.journal_entry_id, account_code: creditAccount,    debit_amount: amount, credit_amount: 0 },
-        { entry_id: row.journal_entry_id, account_code: REVENUE_ACCOUNT,  debit_amount: 0, credit_amount: amount },
+        { entry_id: row.journal_entry_id, account_code: creditAccount, debit_amount: amount, credit_amount: 0 },
+        { entry_id: row.journal_entry_id, account_code: '410102',      debit_amount: 0, credit_amount: amount },
       ])
     }
     
@@ -196,7 +192,7 @@ export async function deleteRestaurantRevenue(id: string, userId: string) {
 export async function createSubscriptionRevenue(dto: any, userId: string) {
   return db.transaction(async (tx) => {
     const [row] = await tx.insert(subscriptionRevenue).values({ ...dto, created_by: userId } as any).returning()
-    const entry = await createRevenueJournalEntry(tx, Number(dto.amount), 'إيراد اشتراكات', dto.revenue_date, dto.payment_method, userId)
+    const entry = await createRevenueJournalEntry(tx, Number(dto.amount), 'إيراد اشتراكات', dto.revenue_date, dto.payment_method, userId, '410103')
     await tx.update(subscriptionRevenue).set({ journal_entry_id: entry.id } as any).where(eq(subscriptionRevenue.id, row.id))
     await writeAuditLog(tx, { userId, action: 'CREATE', tableName: 'subscription_revenue', recordId: row.id, newValues: row })
     return row
@@ -214,20 +210,16 @@ export async function updateSubscriptionRevenue(id: string, dto: any, userId: st
     
     if (row.journal_entry_id) {
       await tx.update(journalEntries).set({
-        expense_date: dto.revenue_date,
+        entry_date: dto.revenue_date,
         description: 'إيراد اشتراكات'
       } as any).where(eq(journalEntries.id, row.journal_entry_id))
-      
+
       await tx.delete(journalEntryLines).where(eq(journalEntryLines.entry_id, row.journal_entry_id))
-      
-      const REVENUE_ACCOUNT   = '410101'
-      const PAYMENT_ACCOUNTS = { 'كاش': '1101', 'بنك': '1104', 'آجل': '1201' }
-      const creditAccount    = PAYMENT_ACCOUNTS[dto.payment_method] ?? '1104'
+      const creditAccount = REVENUE_PAYMENT_ACCOUNTS[dto.payment_method] ?? '1104'
       const amount = Number(dto.amount)
-      
       await tx.insert(journalEntryLines).values([
-        { entry_id: row.journal_entry_id, account_code: creditAccount,    debit_amount: amount, credit_amount: 0 },
-        { entry_id: row.journal_entry_id, account_code: REVENUE_ACCOUNT,  debit_amount: 0, credit_amount: amount },
+        { entry_id: row.journal_entry_id, account_code: creditAccount, debit_amount: amount, credit_amount: 0 },
+        { entry_id: row.journal_entry_id, account_code: '410103',      debit_amount: 0, credit_amount: amount },
       ])
     }
     

@@ -30,100 +30,55 @@ function AnimatedNumber({ value, suffix = '', decimals = 0 }: any) {
   return <span style={{ fontFamily: 'var(--font-latin)' }}>{displayValue}{suffix}</span>
 }
 
-// Premium KPI Card
-function KPICard({ title, value, trend, icon, color, sparkline }: any) {
-  const isPositive = trend >= 0
+// Clean Minimal KPI Card
+function KPICard({ title, value, trend, icon, color }: any) {
+  const hasTrend = trend !== null && trend !== undefined
+  const isPositive = hasTrend && trend >= 0
   const colorScheme: Record<string, any> = {
-    success: { bg: 'rgba(29,184,123,0.08)', border: 'rgba(29,184,123,0.20)', icon: '#1db87b', text: '#1db87b' },
-    danger: { bg: 'rgba(232,56,77,0.08)', border: 'rgba(232,56,77,0.20)', icon: '#e8384d', text: '#e8384d' },
-    gold: { bg: 'rgba(212,168,83,0.10)', border: 'rgba(212,168,83,0.20)', icon: '#D4A853', text: '#D4A853' },
-    info: { bg: 'rgba(59,130,246,0.08)', border: 'rgba(59,130,246,0.20)', icon: '#3b82f6', text: '#3b82f6' },
+    success: { accent: '#1db87b', iconBg: 'rgba(29,184,123,0.10)' },
+    danger:  { accent: '#e8384d', iconBg: 'rgba(232,56,77,0.10)'  },
+    gold:    { accent: '#D4A853', iconBg: 'rgba(212,168,83,0.12)' },
+    info:    { accent: '#3b82f6', iconBg: 'rgba(59,130,246,0.10)' },
   }
   const scheme = colorScheme[color] || colorScheme.gold
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.4 }}
       viewport={{ once: true }}
       style={{
-        background: scheme.bg,
-        border: `1.5px solid ${scheme.border}`,
-        borderRadius: 2,
-        padding: 24,
-        position: 'relative',
-        overflow: 'hidden',
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border-color)',
+        borderTop: `3px solid ${scheme.accent}`,
+        borderRadius: 'var(--radius-md)',
+        padding: 20,
       }}
-      whileHover={{ y: -4, boxShadow: `0 0 20px ${scheme.icon}20` }}
+      whileHover={{ boxShadow: 'var(--shadow-md)' }}
     >
-      {/* Gradient overlay */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        background: `linear-gradient(135deg, ${scheme.icon}08 0%, transparent 100%)`,
-        pointerEvents: 'none',
-      }} />
-
-      <div style={{ position: 'relative', zIndex: 1 }}>
-        {/* Header */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          marginBottom: 16,
-        }}>
-          <p style={{
-            fontSize: 13,
-            fontWeight: 500,
-            color: 'var(--text-secondary)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-            margin: 0,
-          }}>
-            {title}
-          </p>
-          <div style={{
-            width: 40,
-            height: 40,
-            borderRadius: 2,
-            background: `${scheme.icon}15`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: scheme.icon,
-          }}>
-            {icon}
-          </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+        <p style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>
+          {title}
+        </p>
+        <div style={{ width: 36, height: 36, borderRadius: 'var(--radius-sm)', background: scheme.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: scheme.accent }}>
+          {icon}
         </div>
-
-        {/* Value */}
-        <div style={{
-          fontSize: 32,
-          fontWeight: 700,
-          color: 'var(--text-primary)',
-          fontFamily: 'var(--font-latin)',
-          marginBottom: 12,
-          lineHeight: 1,
-        }}>
-          <AnimatedNumber value={value / 1000} suffix="K" decimals={1} />
-        </div>
-
-        {/* Trend */}
-        {trend !== undefined && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 12,
-            color: isPositive ? '#1db87b' : '#e8384d',
-            fontWeight: 500,
-          }}>
-            {isPositive ? <ArrowUpRight size={14} /> : <ArrowDownLeft size={14} />}
-            <span>{Math.abs(trend).toFixed(1)}% {isPositive ? 'increase' : 'decrease'}</span>
-          </div>
-        )}
       </div>
+
+      <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'var(--font-latin)', marginBottom: 10, lineHeight: 1 }}>
+        <AnimatedNumber value={value / 1000} suffix="K" decimals={1} />
+      </div>
+
+      {hasTrend ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: isPositive ? '#1db87b' : '#e8384d', fontWeight: 500 }}>
+          {isPositive ? <ArrowUpRight size={13} /> : <ArrowDownLeft size={13} />}
+          <span style={{ fontFamily: 'var(--font-latin)' }}>{Math.abs(trend).toFixed(1)}%</span>
+          <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>{isPositive ? 'vs prev' : 'vs prev'}</span>
+        </div>
+      ) : (
+        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>—</div>
+      )}
     </motion.div>
   )
 }
@@ -208,17 +163,8 @@ export default function DashboardPage() {
           transition={{ duration: 0.6 }}
           style={{ marginBottom: 32 }}
         >
-          <h1 style={{
-            fontSize: 36,
-            fontWeight: 700,
-            background: 'linear-gradient(135deg, var(--color-primary) 0%, rgba(212,168,83,0.6) 100%)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            margin: 0,
-            marginBottom: 8,
-          }}>
-            {t('dashboard.welcome')}, {user?.full_name?.split(' ')[0]}! 👋
+          <h1 style={{ fontSize: 28, fontWeight: 700, color: 'var(--text-primary)', margin: 0, marginBottom: 6 }}>
+            {t('dashboard.welcome')}, {user?.full_name?.split(' ')[0]}
           </h1>
           <p style={{
             fontSize: 14,
@@ -245,28 +191,28 @@ export default function DashboardPage() {
           <KPICard
             title={t('dashboard.totalRevenue')}
             value={totalRevenue}
-            trend={8.2}
+            trend={dashboard?.trends?.revenue ?? null}
             icon={<DollarSign size={20} />}
             color="success"
           />
           <KPICard
             title={t('dashboard.totalExpenses')}
             value={totalExpenses}
-            trend={-3.1}
+            trend={dashboard?.trends?.expenses ?? null}
             icon={<TrendingDown size={20} />}
             color="danger"
           />
           <KPICard
             title={t('dashboard.netProfit')}
             value={netProfit}
-            trend={12.5}
+            trend={dashboard?.trends?.net_profit ?? null}
             icon={<TrendingUp size={20} />}
             color="success"
           />
           <KPICard
             title={t('dashboard.vat')}
             value={vatPayable}
-            trend={0}
+            trend={dashboard?.trends?.gross_margin ?? null}
             icon={<Target size={20} />}
             color="gold"
           />
@@ -278,19 +224,19 @@ export default function DashboardPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4 }}
             viewport={{ once: true }}
             style={{
-              background: 'linear-gradient(180deg, var(--bg-surface) 0%, rgba(59,130,246,0.02) 100%)',
-              border: '1px solid rgba(59,130,246,0.15)',
-              borderRadius: 8,
+              background: 'var(--bg-surface)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-lg)',
               padding: 24,
               overflow: 'hidden',
             }}
-            whileHover={{ boxShadow: '0 0 25px rgba(59,130,246,0.1)' }}
+            whileHover={{ boxShadow: 'var(--shadow-md)' }}
           >
-            <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}>
-              💹 {t('dashboard.performanceAnalysis') || 'Revenue Trend'}
+            <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 20, color: 'var(--text-primary)' }}>
+              {t('dashboard.performanceAnalysis') || 'Revenue Trend'}
             </h3>
             <div style={{ height: 320 }}>
               <ResponsiveContainer width="100%" height="100%">
@@ -327,19 +273,20 @@ export default function DashboardPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            transition={{ duration: 0.4, delay: 0.08 }}
             viewport={{ once: true }}
             style={{
-              background: 'linear-gradient(180deg, var(--bg-surface) 0%, rgba(29,184,123,0.02) 100%)',
-              border: '1px solid rgba(29,184,123,0.15)',
-              borderRadius: 8,
+              background: 'var(--bg-surface)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-lg)',
               padding: 24,
               overflow: 'hidden',
             }}
-            whileHover={{ boxShadow: '0 0 25px rgba(29,184,123,0.1)' }}
+            whileHover={{ boxShadow: 'var(--shadow-md)' }}
           >
-            <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 6 }}>
-              📊 {t('dashboard.profitMargin')} <span style={{ color: '#1db87b', background: 'rgba(29,184,123,0.1)', padding: '2px 8px', borderRadius: 4, fontSize: 13, marginLeft: 8 }}>{profitMargin.toFixed(1)}%</span>
+            <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 20, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+              {t('dashboard.profitMargin')}
+              <span style={{ color: '#1db87b', background: 'rgba(29,184,123,0.08)', padding: '2px 8px', borderRadius: 'var(--radius-sm)', fontSize: 12, border: '1px solid rgba(29,184,123,0.15)' }}>{profitMargin.toFixed(1)}%</span>
             </h3>
             <div style={{ height: 320 }}>
               <ResponsiveContainer width="100%" height="100%">
@@ -392,16 +339,16 @@ export default function DashboardPage() {
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
           style={{
-            background: 'rgba(59,130,246,0.05)',
-            border: '1px solid rgba(59,130,246,0.10)',
-            borderRadius: 2,
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-lg)',
             padding: 24,
             overflow: 'hidden',
           }}
-          whileHover={{ boxShadow: '0 0 20px rgba(59,130,246,0.15)' }}
+          whileHover={{ boxShadow: 'var(--shadow-md)' }}
         >
-          <h3 style={{ fontSize: 16, fontWeight: 600, margin: 0, marginBottom: 20, color: 'var(--text-primary)' }}>
-            🛒 {t('dashboard.revenueChannels')}
+          <h3 style={{ fontSize: 15, fontWeight: 600, margin: 0, marginBottom: 20, color: 'var(--text-primary)' }}>
+            {t('dashboard.revenueChannels')}
           </h3>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 1fr) minmax(200px, 1fr)', gap: 32, alignItems: 'center' }}>
@@ -464,17 +411,17 @@ export default function DashboardPage() {
           transition={{ duration: 0.5 }}
           viewport={{ once: true }}
           style={{
-            background: 'rgba(212,168,83,0.05)',
-            border: '1px solid rgba(212,168,83,0.10)',
-            borderRadius: 2,
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-lg)',
             padding: 24,
             overflow: 'hidden',
-            marginTop: 32,
+            marginTop: 24,
           }}
-          whileHover={{ boxShadow: '0 0 20px rgba(212,168,83,0.15)' }}
+          whileHover={{ boxShadow: 'var(--shadow-md)' }}
         >
-          <h3 style={{ fontSize: 16, fontWeight: 600, margin: 0, marginBottom: 20, color: 'var(--text-primary)' }}>
-            📝 {t('dashboard.recentTransactionsTitle')}
+          <h3 style={{ fontSize: 15, fontWeight: 600, margin: 0, marginBottom: 20, color: 'var(--text-primary)' }}>
+            {t('dashboard.recentTransactionsTitle')}
           </h3>
 
           {recentTransactions && recentTransactions.length > 0 ? (
